@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class ChatMessage extends StatelessWidget {
   final String _name = "Sankalp";
   final String text ;
@@ -21,21 +22,18 @@ class ChatMessage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               new Text(_name , style: Theme.of(context).textTheme.subhead),
-              new Container(
-                margin: EdgeInsets.only(top: 5.0),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 72,
+                  child: new Container(
+                    margin: EdgeInsets.only(top: 5.0),
 
-                child: new Wrap(
-                  alignment: WrapAlignment.end,
-                  children: <Widget>[
-                    new Text(text)
-                  ],
-                )
+                    child:new Text(text)
+
+                    ),
                 ),
-
-            ],
-          )
-        ],
-      ),
+              ])
+                ]),
+          
     );
   }
 }

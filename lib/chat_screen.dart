@@ -2,6 +2,7 @@ import 'package:chat_app/chat_message.dart';
 import 'package:flutter/material.dart';
 import 'chat_message.dart';
 
+
 class chatScreen extends StatefulWidget {
   @override
   _chatScreenState createState() => _chatScreenState();
