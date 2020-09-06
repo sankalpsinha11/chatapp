@@ -1,6 +1,8 @@
 import 'package:chat_app/chat_message.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'chat_message.dart';
+import 'package:flutter/animation.dart';
 
 
 class chatScreen extends StatefulWidget {
@@ -8,16 +10,41 @@ class chatScreen extends StatefulWidget {
   _chatScreenState createState() => _chatScreenState();
 }
 
-class _chatScreenState extends State<chatScreen> {
+class _chatScreenState extends State<chatScreen> with SingleTickerProviderStateMixin{
 
   final TextEditingController _textcontroller = new TextEditingController();
   final List<ChatMessage> _messages = <ChatMessage>[];
+  Animation<double> animation;
+  AnimationController controller;
+
+  void initState() {
+    super.initState();
+    controller =
+        AnimationController(duration: const Duration(seconds: 1), vsync: this);
+    animation = Tween<double>(begin: 15.0, end: 50.0).animate(controller)
+      ..addListener(() {
+        setState(() {
+          // The state that has changed here is the animation object’s value.
+        });
+      });
+  }
+
+   increaseFontSize() {
+    controller.forward();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
 
-  void _handleSubmitted(String text){
+   _handleSubmitted(String text){
     _textcontroller.clear();
     ChatMessage message = new ChatMessage(
-        text: text
+        text: text,
+      fontSize: animation.value,
     );
     setState(() {
       _messages.insert(0, message );
@@ -27,7 +54,7 @@ class _chatScreenState extends State<chatScreen> {
   Widget _textComposerWidget(){
     return IconTheme(
       data: new IconThemeData(
-        color: Colors.blue
+        color: Color(0xFFDE6751),
       ),
       child: Container(
           margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -35,16 +62,34 @@ class _chatScreenState extends State<chatScreen> {
             children: <Widget>[
               new Flexible(
                   child: new TextField(
-                    decoration: new InputDecoration.collapsed(hintText: "Send a message"),
-                    onSubmitted: _handleSubmitted,
+                    decoration: new InputDecoration.collapsed(hintText: "Send a message",hintStyle: TextStyle(
+                      fontSize: 17.0
+                    )),
                     controller: _textcontroller,
+                    style: TextStyle(fontSize: animation.value),
                   )
               ),
               new Container(
                 margin: EdgeInsets.symmetric(horizontal: 4.0),
-                child : IconButton(
-                    icon: new Icon(Icons.send) ,
-                    onPressed: ()=> _handleSubmitted(_textcontroller.text)
+                child : GestureDetector(
+                  child: Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: IconButton(
+                      icon : Icon(Icons.send , size: 30.0,color: Color(0xFFDE6751),),
+                    onPressed: (){
+                        (_textcontroller.text == "") ? print("no") : _handleSubmitted(_textcontroller.text);
+                    },
+                    ),
+                  ),
+                  onLongPress: (){
+                    if(_textcontroller.text.isNotEmpty){
+                      increaseFontSize();
+                    }
+                  },
+                  onLongPressEnd: (details){
+                    _handleSubmitted(_textcontroller.text);
+                    controller.animateTo(0,duration: Duration(milliseconds: 1));
+                  },
                 ),
               )
             ],
@@ -67,7 +112,7 @@ class _chatScreenState extends State<chatScreen> {
           ),
         ),
         new Divider(
-          height: 1.0,
+          height: 10.0,
         ),
         new Container(
           decoration: new BoxDecoration(
